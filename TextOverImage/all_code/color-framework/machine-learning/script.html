@@ -1,0 +1,116 @@
+<html>
+<body>
+
+<h3>Hi! Vlad Ionescu wishes you a warm welcome!</h3>
+<h1>Loss: </h1><div id="content_loss"></div>
+
+<script src="http://cs.stanford.edu/people/karpathy/convnetjs/build/convnet.js"></script>
+
+<script>
+    // Trained data (manual, by designers)
+    // H1,S1,B1,H2,S2,B2,H3,S3,B3,Hres,Sres,Bres
+    pre_trained_data = [
+            0.9710145,0.6571429,0.9607843,0.9504504,0.8486239,0.85490197,0.80274266,0.9461078,0.654902,0.15231259,1.0,0.81960785,
+            0.15128206,0.52845526,0.48235294,0.009900987,0.81124496,0.9764706,0.7965517,0.6223176,0.9137255,0.15231259,1.0,0.81960785,
+            0.80614656,0.5802469,0.9529412,0.24333334,0.84745765,0.9254902,0.99501425,0.975,0.9411765,0.0,0.0,0.0,
+            0.9636752,0.5864662,0.52156866,0.9841954,0.97890294,0.92941177,0.14136904,0.91056913,0.48235294,0.0,0.0,0.0,
+            0.21794872,0.1092437,0.46666667,0.5536399,0.68774706,0.99215686,0.2393411,0.9717514,0.69411767,0.0,0.0,0.0,
+            0.6695402,0.5888325,0.77254903,0.0035211246,0.9403973,0.5921569,0.46453902,0.74603176,0.49411765,0.30522874,1.0,1.0,
+            0.43005952,0.896,0.49019608,0.707483,0.3951613,0.4862745,0.8057971,0.93495935,0.48235294,0.30522874,1.0,1.0,
+            0.79421765,0.44545454,0.8627451,0.98383087,0.59292036,0.8862745,0.1469534,0.69402987,0.5254902,0.0,1.0,0.6,
+            0.007246375,0.8679245,0.41568628,0.8437002,0.8228347,0.99607843,0.013806711,0.6787149,0.9764706,0.15714286,1.0,0.9607843,
+            0.67317075,0.9318182,0.8627451,0.55172414,0.8613861,0.7921569,0.9230769,0.34513274,0.44313726,0.15714286,1.0,0.9607843,
+            0.5018018,0.87677723,0.827451,0.9408602,0.75303644,0.96862745,0.5646067,0.978022,0.7137255,0.0,0.0,1.0,
+            0.40117994,0.86259544,0.5137255,0.9912281,0.095,0.78431374,0.35563383,0.8765432,0.63529414,0.0,0.0,1.0,
+            0.8333333,0.56281406,0.78039217,0.13017032,0.5569106,0.9647059,0.2553419,0.63414633,0.9647059,0.66796875,0.8101266,0.61960787,
+            0.42391303,0.20353982,0.8862745,0.8091085,0.9347826,0.72156864,0.83433735,0.98224854,0.6627451,0.32815197,1.0,0.75686276,
+            0.35906863,0.60444444,0.88235295,0.54791665,0.71748877,0.8745098,0.22651935,0.97837836,0.7254902,0.0,1.0,1.0,
+            0.48631838,0.83229816,0.6313726,0.6187215,0.6460177,0.44313726,0.1419753,0.9264706,0.8,0.0,1.0,1.0,
+            0.9633333,0.46296296,0.84705883,0.0258467,0.92574257,0.7921569,0.6666667,0.8773006,0.6392157,0.3288889,1.0,0.88235295,
+            0.3006536,0.9357798,0.85490197,0.8782051,0.9570552,0.6392157,0.5697675,0.35833332,0.9411765,0.17948718,1.0,0.6627451,
+            0.9284116,0.9197531,0.63529414,0.5288462,0.4110672,0.99215686,0.93333334,0.28947368,0.74509805,0.0,0.0,0.68235296,
+            0.37612614,0.37563452,0.77254903,0.8828502,0.90789473,0.59607846,0.8912429,0.5437788,0.8509804,0.7439236,1.0,0.7529412,
+            0.6015737,0.966805,0.94509804,0.8839286,0.91803277,0.95686275,0.5740741,0.26086956,0.8117647,0.7439236,1.0,0.7529412,
+            0.49814817,0.7659575,0.92156863,0.636646,0.64658636,0.9764706,0.103286386,0.89873415,0.92941177,0.7439236,1.0,0.7529412
+    ];
+    
+    for (var color = 0; color < 3; color++) {
+        // color == 0 => H
+        // color == 1 => S
+        // color == 2 => B
+        // Initialize neural network for this specific channel.
+        
+        var multiplyFactor = 100;
+        if (color == 0)
+            multiplyFactor = 360;
+        
+        var layer_defs = [];
+        layer_defs.push({type:'input', out_sx:1, out_sy:1, out_depth:3});
+        layer_defs.push({type:'fc', num_neurons:100, activation:'sigmoid'});
+        layer_defs.push({type:'regression', num_neurons:1});
+
+        var net = new convnetjs.Net();
+        net.makeLayers(layer_defs);
+
+        // Create trainer and train on given dataset.
+        var trainer = new convnetjs.Trainer(net,
+                                            {method: 'adadelta', l2_decay: 0.001, batch_size: 1});
+    
+        for (var i = 0; i < pre_trained_data.length; i += 12) {
+            var vol3d = new convnetjs.Vol(1, 1, 3);
+            
+            vol3d.set(0, 0, 0, multiplyFactor * pre_trained_data[i + 3*0 + color]);
+            vol3d.set(0, 0, 1, multiplyFactor * pre_trained_data[i + 3*1 + color]);
+            vol3d.set(0, 0, 2, multiplyFactor * pre_trained_data[i + 3*2 + color]);
+            
+            result = [];
+            result[0] = multiplyFactor * pre_trained_data[i + 3*3 + color];
+            
+            trainer.train(vol3d, result);
+        }
+
+        var steps = 10000;
+        while (steps >= 0) {
+            steps --;
+            avgloss = 0.0;
+
+            for (var i = 0; i < pre_trained_data.length; i += 12) {
+                var vol3d = new convnetjs.Vol(1, 1, 3);
+            
+                vol3d.set(0, 0, 0, multiplyFactor * pre_trained_data[i + 3*0 + color]);
+                vol3d.set(0, 0, 1, multiplyFactor * pre_trained_data[i + 3*1 + color]);
+                vol3d.set(0, 0, 2, multiplyFactor * pre_trained_data[i + 3*2 + color]);
+            
+                result = [];
+                result[0] = multiplyFactor * pre_trained_data[i + 3*3 + color];
+            
+                trainer.train(vol3d, result);
+            
+                avgloss += (trainer.train(vol3d, result)).loss;
+            }
+        
+            console.log("[" + color + "][" + steps + "] Loss: " + (avgloss / (pre_trained_data.length/12)));
+        
+            // if ((avgloss / (pre_trained_data.length/12)) < 2000)
+            //      break;
+        }
+
+
+        // Test. Predict on given datapoints.
+        for (var i = 0; i < pre_trained_data.length; i += 12) {
+            var vol3d = new convnetjs.Vol(1, 1, 3);
+        
+            vol3d.set(0, 0, 0, multiplyFactor * pre_trained_data[i + 3*0 + color]);
+            vol3d.set(0, 0, 1, multiplyFactor * pre_trained_data[i + 3*1 + color]);
+            vol3d.set(0, 0, 2, multiplyFactor * pre_trained_data[i + 3*2 + color]);
+        
+            var predicted_values = net.forward(vol3d);
+        
+            console.log("[" + color + "] predicted values: %o", predicted_values);
+        }
+    }
+                                           
+</script>
+
+</body>
+<html>

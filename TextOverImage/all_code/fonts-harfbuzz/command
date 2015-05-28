@@ -1,0 +1,1 @@
+hb-view --output-file=image.png --output-format=png --margin=0 OpenSans-Regular.ttf "Vlad Ionescu"

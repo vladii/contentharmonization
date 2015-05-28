@@ -1,0 +1,59 @@
+———————- Results of testing algorithm ———————-
+
+We want to compare the performance of two algorithms which find points of interest
+in a given image. We currently have 2 algorithms (I’ll name them Old and New algorithm)
+and the New one should outperform the Old one (produce visually better results). Here I
+will present some numbers which give an indicator of their performances, by comparing
+their output with a ground truth image (a perfect match will produce a Cost equal to 0
+and this Cost increases with *visually* performance degradation).
+
+Note: All images (with points of interest) were scaled to 64x64.
+
+1) test images/original images/Image_1.bmp
+
+a) Old Algorithm
+	533 points of interest in input matrix!
+	828 points of interest in ref matrix
+	Number of matched points: 533
+	Number of unmatched points: 295
+	Cost: 168977
+
+b) New Algorithm
+	539 points of interest in input matrix!
+	828 points of interest in ref matrix
+	Number of matched points: 539
+	Number of unmatched points: 289
+	Cost: 20061
+
+2) test images/original images/Image_2.bmp
+
+a) Old Algorithm
+	404 points of interest in input matrix!
+	531 points of interest in ref matrix
+	Number of matched points: 404
+	Number of unmatched points: 127
+	Cost: 140929
+
+b) New Algorithm
+	527 points of interest in input matrix!
+	531 points of interest in ref matrix
+	Number of matched points: 527
+	Number of unmatched points: 4
+	Cost: 62058
+
+3) test images/original images/Image_10.bmp
+
+a) Old Algorithm
+	366 points of interest in input matrix!
+	505 points of interest in ref matrix
+	Number of matched points: 366
+	Number of unmatched points: 139
+	Cost: 10894
+
+b) New Algorithm
+	452 points of interest in input matrix!
+	505 points of interest in ref matrix
+	Number of matched points: 452
+	Number of unmatched points: 53
+	Cost: 3241
+

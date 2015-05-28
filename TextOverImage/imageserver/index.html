@@ -1,0 +1,24 @@
+<html>
+
+<body>
+<h3><b>Vlad Ionescu</b> wishes you a warm welcome!</h3><br>
+<img src="http://s22.postimg.org/njd3ehy4x/pass.jpg"></img><br>
+
+
+<form id      =  "uploadForm"
+    enctype   =  "multipart/form-data"
+    action    =  "/api/photo"
+    method    =  "post">
+
+    <table>
+    <tr><td>Textul (fara spatii):</td> <td><input type="text" name="userText" /></td></tr>
+    <tr><td>Dimensiunea textului (de prefer intre 30-50):</td> <td><input type="text" name="userTextDim" /></td></tr>
+    <tr><td>Font type:</td> <td><input type="text" name="userFont" value="Default: OpenSans Regular"></td></tr>
+    <tr><td>Imaginea:</td> <td><input type="file" name="userPhoto" /></td> </tr>
+    <tr><td><input type="submit" value="Testeaza-ma, te rog din suflet!" name="submit"></td></tr>
+    </table>
+</form>
+
+</body>
+
+</html>
